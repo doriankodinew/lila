@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Лила (игра)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+
+  button {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  .log {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .log p {
+    margin: 5px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Лила (игра)</h1>
+  <button id="rollDiceBtn">Бросить кубик</button>
+  <div id="log" class="log"></div>
+</div>
+
+<script>
+  const rollDiceBtn = document.getElementById('rollDiceBtn');
+  const log = document.getElementById('log');
+  let playerPosition = 6;
+  const totalCells = 72;
+  
+  const lilaData = [
+  { number: 1, description: "Рождение (джанма)" },
+  { number: 2, description: "Майя" },
+  { number: 3, description: "Гнев (кродха)" },
+  { number: 4, description: "Жадность (лобха)" },
+  { number: 5, description: "Физический план (бху-лока)" },
+  { number: 6, description: "Заблуждение (моха)" },
+  { number: 7, description: "Тщеславие (мада)" },
+  { number: 8, description: "Алчность (матсара или матсаръя)" },
+  { number: 9, description: "Чувственный план (кама-лока)" },
+  { number: 10, description: "Очищение (тапа)" },
+  { number: 11, description: "Развлечения (гандхарвы)" },
+  { number: 12, description: "Зависть (ирасъя)" },
+  { number: 13, description: "Ничтожность (антарикша)" },
+  { number: 14, description: "Астральный план (бхувар-лока)" },
+  { number: 15, description: "План фантазии (нага-лока)" },
+  { number: 16, description: "Ревность (двеша)" },
+  { number: 18, description: "План радости (харша-лока)" },
+  { number: 19, description: "План кармы (карма-лока)" },
+  { number: 20, description: "Благотворительность (дана)" },
+  { number: 21, description: "Искупление (самана папа)" },
+  { number: 22, description: "План Дхармы (Дхарма-лока)" },
+  { number: 23, description: "Небесный план (сварга-лока)" },
+  { number: 24, description: "Плохая компания (ку-санг-лока)" },
+  { number: 25, description: "Хорошая компания (су-санг-лока)" },
+  { number: 26, description: "Печаль (дукха)" },
+  { number: 27, description: "Самоотверженное служение (парамартха)" },
+  { number: 28, description: "Истинная религиозность (судхарма)" },
+  { number: 29, description: "Неправедность или аморальность (адхарма)" },
+  { number: 30, description: "Хорошие тенденции (уттама гати)" },
+  { number: 31, description: "План святости (якша-лока)" },
+  { number: 32, description: "План равновесия (махар-лока)" },
+  { number: 33, description: "План ароматов (гандха-лока)" },
+  { number: 34, description: "План вкуса (раса-лока)" },
+  { number: 35, description: "Чистилище (нарака-лока)" },
+  { number: 36, description: "Ясность сознания (сваччха)" },
+  { number: 37, description: "Джняна (гьяна)" },
+  { number: 38, description: "Прана-лока" },
+  { number: 39, description: "Апана-лока" },
+  { number: 40, description: "Въяна-лока" },
+  { number: 41, description: "Человеческий план (джана-лока)" },
+  { number: 42, description: "План Агни (Агни-лока)" },
+  { number: 43, description: "Рождение человека (манушъя-джанма)" },
+  { number: 44, description: "Неведение (авидья)" },
+  { number: 45, description: "Правильное знание (сувидъя)" },
+  { number: 46, description: "Различение (вивека)" },
+  { number: 47, description: "План нейтральности (сарасвати)" },
+  { number: 48, description: "Солнечный план (ямуна)" },
+  { number: 49, description: "Лунный план (ганга)" },
+  { number: 50, description: "План аскетизма (тапа-лока)" },
+  { number: 51, description: "Земля (притхиви)" },
+  { number: 52, description: "План насилия (химса-лока)" },
+  { number: 53, description: "План жидкостей (джала-лока)" },
+  { number: 54, description: "План духовной преданности (бхакти-лока)" },
+  { number: 55, description: "Эгоизм (ахамкара)" },
+  { number: 56, description: "План изначальных вибраций (Омкара)" },
+  { number: 57, description: "План газов (вайю-лока)" },
+  { number: 58, description: "План сияния (теджа-лока)" },
+  { number: 59, description: "План реальности (сатья-лока)" },
+  { number: 60, description: "Позитивный интеллект (субуддхи)" },
+  { number: 61, description: "Негативный интеллект (дурбуддхи)" },
+  { number: 62, description: "Счастье (сукха)" },
+  { number: 63, description: "Тамас" },
+  { number: 64, description: "Феноменальный план (пракрити-лока)" },
+  { number: 65, description: "План внутреннего пространства (уранта-лока)" },
+  { number: 66, description: "План блаженства (ананда-лока)" },
+  { number: 67, description: "План космического блага (Рудра-лока)" },
+  { number: 68, description: "Космическое Сознание (Вайкунтха-лока)" },
+  { number: 69, description: "План Абсолюта (Брахма-лока)" },
+  { number: 70, description: "Саттвагуна" },
+  { number: 71, description: "Раджогуна" },
+  { number: 72, description: "Тамогуна" }
+];
+
+  const specialCells = {
+    10: 23, 17: 69, 20: 32, 27: 41, 28: 50, 37: 66,
+    45: 67, 46: 62, 54: 68, 63: 2, 16: 4, 29: 6,
+    24: 7, 12: 8, 44: 9, 61: 13, 52: 35, 72: 51
+  };
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+	function addLogMessage(message, color = '') {
+	  const logEntry = document.createElement('p');
+	  logEntry.textContent = message;
+	  if (color) {
+		logEntry.style.color = color; // Устанавливаем цвет текста динамически
+	  }
+	  log.appendChild(logEntry);
+	  log.scrollTop = log.scrollHeight;
+	}
+
+  rollDiceBtn.addEventListener('click', function() {
+    let diceRoll = getRandomInt(1, 6);
+    let extraMoves = 0;
+
+    while (diceRoll === 6) {
+      addLogMessage(`Выпало число 6. Кубик бросился ещё раз.`);
+      extraMoves += diceRoll; // Собираем "шестерки"
+      diceRoll = getRandomInt(1, 6);
+    }
+	
+	let totalRoll = extraMoves + diceRoll;
+    let newPosition = playerPosition + totalRoll;
+
+    // Если после шестерки выпало другое число, и это не серия шестерок
+    if (extraMoves > 0 && diceRoll !== 6) {
+      addLogMessage(`После серии шестерок выпало число ${diceRoll}. Игрок переместился на ${totalRoll} вперед.`);
+    } else {
+      addLogMessage(`Выпало число ${diceRoll}. Игрок переместился на клетку ${newPosition}.`);
+    }
+
+    if (newPosition > totalCells) {
+      addLogMessage(`Игрок не может переместиться на ${newPosition} клетку. Для завершения игры необходимо выбросить меньшее число.`);
+      return;
+    }
+
+    playerPosition = specialCells[newPosition] !== undefined ? specialCells[newPosition] : newPosition;
+	
+	// Функция для получения описания клетки по её номеру
+	function getCellDescription(cellNumber) {
+	  // Поиск объекта в массиве lilaData, у которого номер совпадает с переданным номером клетки
+	  const cell = lilaData.find(item => item.number === cellNumber);
+	  // Если такая клетка найдена, вернуть её описание, иначе вернуть пустую строку
+	  return cell ? cell.description : '';
+	}
+	
+    addLogMessage(`Игрок попал на клетку ${playerPosition}. ${getCellDescription(playerPosition)}.`, 'green');
+
+    if (playerPosition === 68) {
+      rollDiceBtn.disabled = true;
+      addLogMessage(`Поздравляем! Вы достигли клетки 68 и успешно завершили игру.`, 'red');
+    } else if (playerPosition === totalCells) {
+      rollDiceBtn.disabled = true;
+      addLogMessage(`Игрок достиг клетки ${totalCells}. Игра завершена.`, 'red');
+    }
+  });
+</script>
+</body>
+</html>
